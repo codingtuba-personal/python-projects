@@ -364,5 +364,5 @@ class Soduko():
 
 # example usage:
 
-soduko=Soduko("3*3+3*2",Tk(),SodukoOptions(debugMessages=True))
+soduko=Soduko("3*3+3*3",Tk(),SodukoOptions(debugMessages=True))
 soduko.start()
