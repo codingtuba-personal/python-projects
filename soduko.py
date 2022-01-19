@@ -1,3 +1,4 @@
+from nltk import flatten
 from tkinter import *
 from random import randint as random
 
@@ -197,24 +198,51 @@ class Soduko():
     def shuffle(self):
         if not self.error:
             self.disabled=[]
-            __max=self.board[0][0]*self.board[0][1]
-            _max=int(self.board[0][0]*self.board[0][1])
-            _min=_max-random(3,4)
-            if _min<0: _min=0
-            for i in range(len(self.boxes)):
-                for ii in range(len(self.boxes[0])):
-                    r_left=random(_min, _max)
-                    for _dummy in range(r_left):
-                        if r_left>0:
-                            r_1=random(0,self.board[0][0]-1)
-                            r_2=random(0,self.board[0][1]-1)
-                            self.boxes[i][ii][r_1][r_2]=random(1,__max)
-                            if self.checkGameStatus(i,ii,r_1,r_2)!=False:
-                                self.disabled.append(str(i)+","+str(ii)+","+str(r_1)+","+str(r_2))
-                            else:
-                                print(i,ii,r_1,r_2)
-                                self.boxes[i][ii][r_1][r_2]=-1
-                            r_left-=1
+            _dummy=self.boxes
+
+            # dont touch _i it works
+            def generate():
+                for _i in range(len(_dummy)):
+                    for ii in range(len(_dummy[0])):
+                        gone=[]
+                        for _ in range(len(_dummy[0][0])):
+                            for __ in range(len(_dummy[0][0][0])):
+                                def get_new():
+                                    random_selected=[
+                                        random(0,len(_dummy[0][0])-1),
+                                        random(0,len(_dummy[0][0][0])-1)
+                                    ]
+                                    while random_selected in gone:random_selected=[random(0,len(_dummy[0][0])-1), random(0,len(_dummy[0][0][0])-1)]
+                                    gone.append(random_selected)
+                                    return random_selected
+                                _new=get_new()
+                                iii=_new[0]
+                                iiii=_new[1]
+
+                                print(_new)
+
+                                def _set():
+                                    _dummy[_i][ii][iii][iiii]=random(1,self.board[1][0]*self.board[1][1])
+                                    if self.checkGameStatus(_i,ii,iii,iiii) is False:
+                                        for i in range(1,self.board[0][0]*self.board[0][1]+1):
+                                            _dummy[_i][ii][iii][iiii]=i
+                                            if self.checkGameStatus(_i,ii,iii,iiii) != False:
+                                                break
+                                            elif _dummy[_i][ii][iii][iiii]==self.board[0][0]*self.board[0][1]:
+                                                _dummy[_i][ii][iii][iiii]=-1
+                                _set()
+            generate()
+
+            def tweak():
+                for _ in range(5):
+                    self.boxes[random()]
+
+            canmoveon=False
+            while not canmoveon:
+                if not -1 in flatten(self.boxes): canmoveon=True
+                else: tweak()
+
+            self.boxes=_dummy
         else:
             print("There was an error somewhere.")
 
@@ -364,5 +392,5 @@ class Soduko():
 
 # example usage:
 
-soduko=Soduko("3*3+3*2",Tk(),SodukoOptions(debugMessages=True))
+soduko=Soduko("5*5+4*4",Tk(),SodukoOptions(debugMessages=True))
 soduko.start()
